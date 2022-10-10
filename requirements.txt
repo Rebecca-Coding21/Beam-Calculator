@@ -1,0 +1,4 @@
+pysqlite3
+matplotlib
+flask
+jinja2

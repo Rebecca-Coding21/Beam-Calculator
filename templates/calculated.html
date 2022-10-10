@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block main %}
+    <h3>Input:</h3>
+
+    <table class = "table mytext table-unbordered">
+        <tbody class="table-group-divider">
+            <tr>
+                <td>Number of Fields:</td>
+                <td>{{fields}}</td>
+            </tr>
+            <tr>
+                <td>Span:</td>
+                <td>{{span}} m</td>
+            </tr>
+            <tr>
+                <td>Constant Line Load:</td>
+                <td>{{load}} kN/m</td>
+            </tr>
+            </tbody>
+    </table>
+    
+    <h3>Results:</h3>
+
+    <table class = "table mytext table-unbordered">
+        <tbody class="table-group-divider">
+            <tr>
+                <td>Shear Force:</td>
+                <td>{{shearForce}} kN</td>
+            </tr>
+            <tr>
+                <td>Bending Moment:</td>
+                <td>{{bendingMomentField}} kNm</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <form action = "/" method = "POST">
+                <tr>
+                    <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">New Calculation</button></td>
+                </tr>
+            </form>
+        </tfoot>
+
+    </table>
+
+
+{% endblock %}

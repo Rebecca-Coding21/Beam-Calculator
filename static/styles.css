@@ -1,0 +1,18 @@
+body{
+    color: #ffffff;
+    background: #3e3946e9;
+}
+
+header{
+    text-align: center;
+}
+
+.table-unbordered{
+    border: none;
+    color: #ffffff;
+}
+
+.myblue{
+    font-weight: bold;
+    text-align: center;
+}

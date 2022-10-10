@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <header><h3>Welcome to my Beam Calcutaltion Website!</h3></header>
+
+    <form action = "/calculated" method = "POST">
+        <table class = "table mytext table-unbordered">
+            <tbody class="table-group-divider">
+                <tr>
+                <td><b>Number of Fields:</b></td>
+                <td>
+                    <div class="mb-3">
+                        <select class="form-select mx-auto w-auto" name = "fields">
+                            <option disabled selected>Number of Fields</option>
+                            {% for field in fields %}
+                                <option value = "{{field}}">{{field}}</option>
+                            {% endfor %}
+                        </select>
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><b>Span:</b></td>
+                    <td>
+                        <div class="mb-3">
+                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="shares" name="span" placeholder="Span" type="text">
+                        </div>
+                    </td>
+                    <td><b>m</b></td>
+                </tr>
+                <tr>
+                    <td><b>Constant Line Load:</b></td>
+                    <td><div class="mb-3">
+                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="load" name="load" placeholder="Load [kN/m]" type="text">
+                        </div>
+                    </td>
+                    <td text-align = "left"><b>kN/m</b></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class = "border-0 fw-bold text-end" colspan = "4"><button class="btn btn-primary" type="submit">Calculate Forces</button></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+{% endblock %}
