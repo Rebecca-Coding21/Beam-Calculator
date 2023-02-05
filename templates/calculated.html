@@ -6,46 +6,118 @@
 
 {% block main %}
     <h3>Input:</h3>
+        <div class="col-6"></div>
+            <table class = "table table-bordered table-dark">
+                <tbody>
+                    <tr>
+                        <td>Number of Fields:</td>
+                        <td>{{fields}}</td>
+                    </tr>
+                    <tr>
+                        <td>Span:</td>
+                        <td>{{span}} m</td>
+                    </tr>
+                    <tr>
+                        <td>Constant Line Load:</td>
+                        <td>{{load}} kN/m</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>     
+        {% block csv %}
 
-    <table class = "table mytext table-unbordered">
-        <tbody class="table-group-divider">
-            <tr>
-                <td>Number of Fields:</td>
-                <td>{{fields}}</td>
-            </tr>
-            <tr>
-                <td>Span:</td>
-                <td>{{span}} m</td>
-            </tr>
-            <tr>
-                <td>Constant Line Load:</td>
-                <td>{{load}} kN/m</td>
-            </tr>
-            </tbody>
-    </table>
-    
+        {% endblock %}
     <h3>Results:</h3>
-
-    <table class = "table mytext table-unbordered">
-        <tbody class="table-group-divider">
-            <tr>
-                <td>Shear Force:</td>
-                <td>{{shearForce}} kN</td>
-            </tr>
-            <tr>
-                <td>Bending Moment:</td>
-                <td>{{bendingMomentField}} kNm</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <form action = "/" method = "POST">
+    <div class = "col-5">
+        <table class = "table table-bordered table-dark">
+            <tbody>
                 <tr>
-                    <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">New Calculation</button></td>
+                    <td colspan = "2"><b>Support Forces:</b></td>
                 </tr>
-            </form>
-        </tfoot>
-
-    </table>
-
+                <tr>
+                    <td>A</td>
+                    <td>{{A}} kN</td>
+                </tr>
+                {% if B != 0 %}
+                <tr>
+                    <td>B</td>
+                    <td>{{B}} kN</td>
+                </tr>
+                {% endif %}
+                {% if C != 0 %}
+                <tr>
+                    <td>C</td>
+                    <td>{{C}} kN</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2"><b>Shear Forces:</b></td>
+                </tr>
+                <tr>
+                    <td>Vbl:</td>
+                    <td>{{Vbl}} kN</td>
+                </tr>
+                {% if Vbr != 0 %}
+                <tr>
+                    <td>Vbr:</td>
+                    <td>{{Vbr}} kN</td>
+                </tr>
+                {% endif %}
+                {% if Vcl != 0 %}
+                <tr>
+                    <td>Vcl:</td>
+                    <td>{{Vcl}} kN</td>
+                </tr>
+                {% endif %}
+                {% if Vcr != 0 %}
+                <tr>
+                    <td>Vcr:</td>
+                    <td>{{Vcr}} kN</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2"><b>Bending Moments:</b></td>
+                </tr>
+                <tr>
+                    <td>Field Moment M1:</td>
+                    <td>{{M1}} kNm</td>
+                </tr>
+                {% if M2 != 0 %}
+                <tr>
+                    <td>Field Moment M2:</td>
+                    <td>{{M2}} kNm</td>
+                </tr>
+                {% endif %}
+                {% if M3 != 0 %}
+                <tr>
+                    <td>Field Moment M3:</td>
+                    <td>{{M3}} kNm</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>Support Moment Mb:</td>
+                    <td>{{Mb}} kNm</td>
+                </tr>
+                {% if Mc != 0 %}
+                <tr>
+                    <td>Support Moment Mc:</td>
+                    <td>{{Mc}} kNm</td>
+                </tr>
+                {% endif %}
+            </tbody>
+            <tfoot>
+                <form action = "/" method = "POST">
+                    <tr>
+                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">New Calculation</button></td>
+                    </tr>
+                </form>
+                <form action = "/csv" method = "POST">
+                    <tr>
+                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">Create CSV-File</button></td>
+                    </tr>
+                </form>
+            </tfoot>
+        </table>
+    </div>
 
 {% endblock %}
