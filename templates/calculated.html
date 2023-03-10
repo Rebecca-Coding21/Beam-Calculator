@@ -28,8 +28,9 @@
 
         {% endblock %}
     <h3>Results:</h3>
-    <div class = "col-5">
-        <table class = "table table-bordered table-dark">
+    <table>
+        <tr><td>
+            <table class = "table table-bordered table-dark">
             <tbody>
                 <tr>
                     <td colspan = "2"><b>Support Forces:</b></td>
@@ -111,13 +112,21 @@
                         <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">New Calculation</button></td>
                     </tr>
                 </form>
-                <form action = "/csv" method = "POST">
+                <form>
                     <tr>
-                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">Create CSV-File</button></td>
+                        <td class = "border-0 text-end" colspan = "2"><a class="btn btn-primary" href="\static\results.csv">Download Results as CSV</a></td>
+                    </tr>
+                </form>
+                <form action = "/pdf" method = "POST">
+                    <tr>
+                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">Create PDF-File</button></td>
                     </tr>
                 </form>
             </tfoot>
-        </table>
-    </div>
+        </table></td>
+    <td><img src="{{moments}}" width = "1000" height = "250"></td></tr>
+    <tr><td><img src="{{shearForces}}" width = "1000" height = "250"></td></tr>
+
+</table>
 
 {% endblock %}

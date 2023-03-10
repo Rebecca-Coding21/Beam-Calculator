@@ -4,6 +4,8 @@ import csv
 import sys
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 import numpy as np
 from flask import Flask, redirect, render_template, flash, request
 
@@ -60,7 +62,7 @@ def calculation():
         Vbr_factor = float(momentfactors[n][10])     
         Vcl_factor = float(momentfactors[n][11])  
         Vcr_factor = float(momentfactors[n][12])            
-        M1 = 0.0
+        M1 = 0
         M2 = 0.0
         M3 = 0.0
         Mb = 0.0
@@ -92,70 +94,85 @@ def calculation():
 
         # list of moments
         moments = []
-        if n == 1:
-            moments = [0.0, M1, 0.0]
-        elif n == 2:
-            moments = [0.0, M1, Mb, M1, 0.0]
-        elif n == 3:
-            moments = [0.0, M1, Mb, M2, Mb, M1, 0.0]
-        elif n == 4:
-            moments = [0.0, M1, Mb, M2, Mc, M2, Mb, M1, 0.0]
-        elif n == 5:
-            moments = [0.0, M1, Mb, M2, Mc, M3, Mc, M2, Mb, M1, 0.0]
+        # if n == 1:
+        #     moments = [0.0, M1, 0.0]
+        # elif n == 2:
+        #     moments = [0.0, M1, Mb, M1, 0.0]
+        # elif n == 3:
+        #     moments = [0.0, M1, Mb, M2, Mb, M1, 0.0]
+        # elif n == 4:
+        #     moments = [0.0, M1, Mb, M2, Mc, M2, Mb, M1, 0.0]
+        # elif n == 5:
+        #     moments = [0.0, M1, Mb, M2, Mc, M3, Mc, M2, Mb, M1, 0.0]
         
         #list of shear forces
         shearForces = []
         if n == 1:
-            shearForces = [A, 0, -A]
+            shearForces = [A, -A]
         elif n == 2:
-            shearForces = [A, 0, -B/2, B/2, 0, -A] # two values at one x-location!!! 
+            shearForces = [A, Vbl, -Vbl, -A] # two values at one x-location!!! 
         elif n == 3:
-            shearForces = [A, 0, -B/2, B/2, 0, -B/2, B/2, 0, -A]
+            shearForces = [A, Vbl, Vbr, Vbl, Vbr, -A]
         elif n == 4:
-            shearForces = [A, 0, -B/2, B/2, 0, -C/2, C/2, 0, -B/2, B/2, 0, -A]
+            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A]
         elif n == 5:
-            shearForces = [A, 0, -B/2, B/2, 0, -C/2, C/2, 0, -C/2, C/2, 0, -B/2, B/2, 0, -A]
-        
-        print(moments)
-                
+            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A]
+                        
         #List for x-locations
         x_location = []
 
         for i in range(n * 2 + 1):
             x = i/2 * l
             x_location.append(x)
-        
-        print(x_location)
-        
-        #Result Graph:
-        #Plot(x_location, moments)
 
+        for x in x_location: 
+            M = A * x - (q * x**2)/2
+            moments.append(M)
+
+        x_locationV = []
+
+        for i in range(n + 1):
+            x = i * l
+            x_locationV.append(x)
+            if i != 0 and i != n:
+                x_locationV.append(x)
+        
+        print(x_locationV)
+        
         csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]
 
         #with open(results.csv, "w") as r:
          #   writer = csv.writer(r)
           #  writer.writerow(csv_results)
+        #Plot graph My:
+        PlotMoments(x_location, moments)
+        plt.close()
 
-        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C)
+        #Plot graph V:
+        PlotShearForces(x_locationV, shearForces)
+        plt.close()
+
+        with open(".\\static\\results.csv", "w") as r:
+            writer = csv.writer(r)
+            writer.writerow('test,test,test," test ffd"')
+            writer.writerow(csv_results)
+
+        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png")
         
+
     else:
         return render_template("index.html")
 
-def Plot(x_location, moments):
+def PlotMoments(x_location, moments):
     plt.plot(x_location, moments)
-    plt.show()
-    plt.savefig(sys.stdout.buffer)
-    sys.stdout.flush()
+    return plt.savefig(".\static\images\moments.png")
 
-@app.route('/csv', methods=["GET", "POST"])
-def CreateCsv():
+def PlotShearForces(x_locationV, shearForces):
+    plt.plot(x_locationV, shearForces)
+    return plt.savefig(".\static\images\shearForces.png")
     
-    if request.method == "POST":
-        #with open(results.csv, "w") as r:
-         #   writer = csv.writer(r)
-          #  writer.writerow(csv_results)
-        
-        return render_template("csv.html")
+
+
 
 
 
