@@ -6,11 +6,10 @@
 
 {% block main %}
     <h3>Input:</h3>
-        <div class="col-6"></div>
-            <table class = "table table-bordered table-dark">
+            <table class = "table table-bordered table-dark ml-3" width = "5">
                 <tbody>
                     <tr>
-                        <td>Number of Fields:</td>
+                        <td class="w-75">Number of Fields:</td>
                         <td>{{fields}}</td>
                     </tr>
                     <tr>
@@ -22,15 +21,14 @@
                         <td>{{load}} kN/m</td>
                     </tr>
                 </tbody>
-            </table>
-        </div>     
+            </table> 
         {% block csv %}
 
         {% endblock %}
     <h3>Results:</h3>
     <table>
         <tr><td>
-            <table class = "table table-bordered table-dark">
+            <table class="table table-bordered table-dark">
             <tbody>
                 <tr>
                     <td colspan = "2"><b>Support Forces:</b></td>
@@ -117,15 +115,18 @@
                         <td class = "border-0 text-end" colspan = "2"><a class="btn btn-primary" href="\static\results.csv">Download Results as CSV</a></td>
                     </tr>
                 </form>
-                <form action = "/pdf" method = "POST">
+                <form>
                     <tr>
-                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">Create PDF-File</button></td>
+                        <td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">Download PDF-File</button></td>
                     </tr>
                 </form>
             </tfoot>
-        </table></td>
-    <td><img src="{{moments}}" width = "1000" height = "250"></td></tr>
-    <tr><td><img src="{{shearForces}}" width = "1000" height = "250"></td></tr>
+        </table></td></tr>
+    <tr><td class = "border-0 text-end" colspan = "2"><button class="btn btn-primary" type="submit">New Calculation</button></td></tr>
+    <tr><td><h3>Moment Diagram:</h3></td></tr>
+    <tr><td><img src="{{moments}}" width = "1000" height = "250"></td></tr>
+    <tr><td><h3>Shear Force Diagram:</h3></td></tr>
+    <td><img src="{{shearForces}}" width = "1000" height = "250"></td></tr>
 
 </table>
 

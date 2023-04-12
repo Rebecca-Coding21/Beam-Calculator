@@ -1,6 +1,6 @@
 import os
 from helpers import apology
-import csv
+import csv 
 import sys
 import matplotlib
 import matplotlib.pyplot as plt
@@ -89,8 +89,8 @@ def calculation():
             C = round(C_factor * q * l,2)
             Vbl = round(Vbl_factor * q * l,2)
             Vbr = round(Vbr_factor * q * l,2)
-            Vcl = round(Vbr_factor * q * l,2)
-            Vcr = round(Vbr_factor * q * l,2)
+            Vcl = round(Vcl_factor * q * l,2)
+            Vcr = round(Vcr_factor * q * l,2)
 
         # list of moments
         moments = []
@@ -137,13 +137,10 @@ def calculation():
             if i != 0 and i != n:
                 x_locationV.append(x)
         
-        print(x_locationV)
+        #print(x_locationV)
         
         csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]
 
-        #with open(results.csv, "w") as r:
-         #   writer = csv.writer(r)
-          #  writer.writerow(csv_results)
         #Plot graph My:
         PlotMoments(x_location, moments)
         plt.close()
@@ -154,7 +151,7 @@ def calculation():
 
         with open(".\\static\\results.csv", "w") as r:
             writer = csv.writer(r)
-            writer.writerow('test,test,test," test ffd"')
+            writer.writerow('M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr')
             writer.writerow(csv_results)
 
         return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png")
