@@ -8,6 +8,9 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from flask import Flask, redirect, render_template, flash, request
+#from PyQt5.QtCore import *
+#from PyQt5.QtGui import *
+#from PyQt5.QtWebKit import *
 
 app = Flask(__name__)
 
@@ -78,6 +81,7 @@ def calculation():
         if n == 1:
             Vbl = (q * l)/2     # Shear Force at both supports in kN
             M1 = (q * l**2)/8   # Bending - Moment in middle of field in kNm
+            outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
         else:
             M1 = round(m1_factor * q * l**2,2)
             M2 = round(m2_factor * q * l**2,2)
@@ -94,29 +98,38 @@ def calculation():
 
         # list of moments
         moments = []
-        # if n == 1:
-        #     moments = [0.0, M1, 0.0]
-        # elif n == 2:
-        #     moments = [0.0, M1, Mb, M1, 0.0]
-        # elif n == 3:
-        #     moments = [0.0, M1, Mb, M2, Mb, M1, 0.0]
-        # elif n == 4:
-        #     moments = [0.0, M1, Mb, M2, Mc, M2, Mb, M1, 0.0]
-        # elif n == 5:
-        #     moments = [0.0, M1, Mb, M2, Mc, M3, Mc, M2, Mb, M1, 0.0]
+        #if n == 1:
+           # moments = [0.0, M1, 0.0]
+        #elif n == 2:
+           # moments = [0.0, M1, Mb, M1, 0.0]
+           # outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
+        #elif n == 3:
+           # moments = [0.0, M1, Mb, M2, Mb, M1, 0.0]
+          #  outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
+        #elif n == 4:
+           # moments = [0.0, M1, Mb, M2, Mc, M2, Mb, M1, 0.0]
+           # outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
+        #elif n == 5:
+           # moments = [0.0, M1, Mb, M2, Mc, M3, Mc, M2, Mb, M1, 0.0]
+           # outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
         
         #list of shear forces
         shearForces = []
         if n == 1:
             shearForces = [A, -A]
+            outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
         elif n == 2:
             shearForces = [A, Vbl, -Vbl, -A] # two values at one x-location!!! 
+            outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
         elif n == 3:
             shearForces = [A, Vbl, Vbr, Vbl, Vbr, -A]
+            outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
         elif n == 4:
             shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A]
+            outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
         elif n == 5:
             shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A]
+            outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
                         
         #List for x-locations
         x_location = []
@@ -153,10 +166,19 @@ def calculation():
             writer = csv.writer(r)
             writer.writerow('M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr')
             writer.writerow(csv_results)
-
-        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png")
         
+        #web = QWebView()
+        #web.load(QUrl("http://127.0.0.1:5000/calculated"))
+        #printer = QPrinter()
+        #printer.setPageSize(QPrinter.A4)
+        #printer.setOutputFormat(QPrinter.PdfFormat)
+        #printer.setOutputFileName("results.pdf")
 
+        #outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
+        
+        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png", outlineImage = outlineImageLink)
+        
+        
     else:
         return render_template("index.html")
 

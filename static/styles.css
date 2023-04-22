@@ -16,3 +16,18 @@ header{
     font-weight: bold;
     text-align: center;
 }
+
+.center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%  ;
+}
+
+h4{
+    text-align: center;
+}
+
+p{
+    text-align: center;
+}

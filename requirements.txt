@@ -2,3 +2,4 @@ pysqlite3
 matplotlib
 flask
 jinja2
+PyQt
