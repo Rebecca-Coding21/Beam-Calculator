@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block main %}
-    <h3>Input:</h3>
-            <table class = "table table-bordered table-dark ml-3" width = "5">
+    <h4>Input</h4>
+            <table class = "table table-bordered table-light table-striped ml-3" width = "5">
                 <tbody>
                     <tr>
-                        <td>Number of Fields</td>
-                        <td>Outline</td>
-                        <td>Span</td>
-                        <td>Constant Line Load</td>
+                        <td><b>Number of Fields</b></td>
+                        <td><b>Outline</b></td>
+                        <td><b>Span</b></td>
+                        <td><b>Constant Line Load</b></td>
                     </tr>
                     <tr>
                         <td>{{fields}}</td>
@@ -25,9 +25,9 @@
         {% block csv %}
 
         {% endblock %}
-    <h3>Results:</h3>
+    <h4>Results</h4>
    
-            <table class="table table-bordered table-dark">
+            <table class="table table-bordered table-light table-striped">
             <tbody>
                 <tr>
                     <td colspan = "2"><b>Support Forces:</b></td>
@@ -104,15 +104,15 @@
                 {% endif %}
             </tbody>            
         </table>    
-    <h4>Moment Diagram:</h3>
+    <h4>Moment Diagram</h3>
     <img src="{{moments}}" width="1000" height="250" class="center">
-    <h4>Shear Force Diagram:</h3>
+    <h4>Shear Force Diagram</h3>
     <img src="{{shearForces}}" width="1000" height="250" class="center"><br>
     <p>
-    <button class="btn btn-primary" type="submit">New Calculation</button>
-    <button class="btn btn-primary" type="submit">Download Results as CSV</button>
-    <button class="btn btn-primary" type="submit">Download PDF-File</button>
-    <button class="btn btn-primary" type="submit">Download Diagrams></button>
+    <a class="btn btn-light" href="\">New Calculation</a>
+    <a class="btn btn-light" href="\static\results.csv">Download Results as CSV</a>
+    <a class="btn btn-light" href="\static\results.pdf">Download PDF-File</a>
+    <a class="btn btn-light" href="\static\diagrams.zip">Download Diagrams</a>
     </p>
 
 
