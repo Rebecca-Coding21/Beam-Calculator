@@ -65,7 +65,7 @@ def calculation():
         Vbr_factor = float(momentfactors[n][10])     
         Vcl_factor = float(momentfactors[n][11])  
         Vcr_factor = float(momentfactors[n][12])            
-        M1 = 0
+        M1 = 0.0
         M2 = 0.0
         M3 = 0.0
         Mb = 0.0
@@ -80,7 +80,7 @@ def calculation():
 
         if n == 1:
             Vbl = (q * l)/2     # Shear Force at both supports in kN
-            M1 = (q * l**2)/8   # Bending - Moment in middle of field in kNm
+            M1 = float((q * l**2)/8 )  # Bending - Moment in middle of field in kNm
         else:
             M1 = round(m1_factor * q * l**2,2)
             M2 = round(m2_factor * q * l**2,2)
@@ -115,19 +115,19 @@ def calculation():
         #list of shear forces
         shearForces = []
         if n == 1:
-            shearForces = [A, -A]
+            shearForces = [0, A, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
         elif n == 2:
-            shearForces = [A, Vbl, -Vbl, -A] # two values at one x-location!!! 
+            shearForces = [0, A, Vbl, -Vbl, -A, 0] # two values at one x-location!!! 
             outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
         elif n == 3:
-            shearForces = [A, Vbl, Vbr, Vbl, Vbr, -A]
+            shearForces = [0, A, Vbl, Vbr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
         elif n == 4:
-            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A]
+            shearForces = [0, A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
         elif n == 5:
-            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A]
+            shearForces = [0, A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
                         
         #List for x-locations
@@ -145,9 +145,16 @@ def calculation():
         for i in range(n + 1):
             x_loc = i * l
             x_locationV.append(x_loc)
-            if i != 0 and i != n:
-                x_locationV.append(x_loc)
+            x_locationV.append(x_loc)
+            #if i != 0 and i != n:
+                #x_locationV.append(x_loc)
          #Plot graph V:
+        ax = plt.gca()
+        ax.invert_yaxis()
+        ax.spines['right'].set_color('none')
+        ax.spines['top'].set_color('none')
+        ax.spines['bottom'].set_position(('data', 0))
+        plt.xticks = []
         PlotShearForces(x_locationV, shearForces)
         plt.close()
         #print(x_locationV)
@@ -157,15 +164,19 @@ def calculation():
         #Plot graph My:
         #PlotMoments(x, moments)
 
-        x = np.arange(0, n * l, 0.1)
+        x = np.arange(0, (n * l) + 1, 0.1)
         
         #for x in xs: 
            # M = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
            # moments.append(M)
         #f1 = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
         #f2 = x
-        y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
-
+        y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l), (x > 4 * l) & (x <= 5 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l, n), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
+        ax = plt.gca()
+        ax.invert_yaxis()
+        ax.spines['right'].set_color('none')
+        ax.spines['top'].set_color('none')
+        ax.spines['bottom'].set_position(('data', 0))
         plt.plot(x, y)
         plt.savefig(".\static\images\moments.png")
         plt.close()       
@@ -198,9 +209,11 @@ def PlotShearForces(x_locationV, shearForces):
     plt.plot(x_locationV, shearForces)
     return plt.savefig(".\static\images\shearForces.png")
     
-def f1(x, mb_factor, m1_factor, q, l):
-    return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
-    #return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+def f1(x, mb_factor, m1_factor, q, l, n):
+    if n == 1:
+        return q * (l**2) / 8
+    else:
+        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
 
 def f2(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
     x = x - l
