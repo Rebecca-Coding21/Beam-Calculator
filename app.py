@@ -26,7 +26,7 @@ def index():
 
 @app.route("/calculated", methods=["GET", "POST"])
 def calculation():
-
+    
     list_of_fields = [1,2,3,4,5]
 
     # Post = Calculate Button is pressed
@@ -81,7 +81,6 @@ def calculation():
         if n == 1:
             Vbl = (q * l)/2     # Shear Force at both supports in kN
             M1 = (q * l**2)/8   # Bending - Moment in middle of field in kNm
-            outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
         else:
             M1 = round(m1_factor * q * l**2,2)
             M2 = round(m2_factor * q * l**2,2)
@@ -97,7 +96,7 @@ def calculation():
             Vcr = round(Vcr_factor * q * l,2)
 
         # list of moments
-        moments = []
+        #moments = []
         #if n == 1:
            # moments = [0.0, M1, 0.0]
         #elif n == 2:
@@ -132,35 +131,44 @@ def calculation():
             outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
                         
         #List for x-locations
-        x_location = []
-
-        for i in range(n * 2 + 1):
-            x = i/2 * l
-            x_location.append(x)
-
-        for x in x_location: 
-            M = A * x - (q * x**2)/2
-            moments.append(M)
-
+        #x_location = []
+        #half_L = l / 2
+        #xs = (x * half_L for x in range(0, l))
+ 
+        #for i in range(n * 2 + 1):
+         #   x = i/2 * l
+          #  x_location.append(x)
+        
+        # x-locations for shear forces (because of 2 values at the supports)
         x_locationV = []
 
         for i in range(n + 1):
-            x = i * l
-            x_locationV.append(x)
+            x_loc = i * l
+            x_locationV.append(x_loc)
             if i != 0 and i != n:
-                x_locationV.append(x)
-        
+                x_locationV.append(x_loc)
+         #Plot graph V:
+        PlotShearForces(x_locationV, shearForces)
+        plt.close()
         #print(x_locationV)
         
         csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]
 
         #Plot graph My:
-        PlotMoments(x_location, moments)
-        plt.close()
+        #PlotMoments(x, moments)
 
-        #Plot graph V:
-        PlotShearForces(x_locationV, shearForces)
-        plt.close()
+        x = np.arange(0, n * l, 0.1)
+        
+        #for x in xs: 
+           # M = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
+           # moments.append(M)
+        #f1 = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
+        #f2 = x
+        y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
+
+        plt.plot(x, y)
+        plt.savefig(".\static\images\moments.png")
+        plt.close()       
 
         with open(".\\static\\results.csv", "w") as r:
             writer = csv.writer(r)
@@ -174,7 +182,7 @@ def calculation():
         #printer.setOutputFormat(QPrinter.PdfFormat)
         #printer.setOutputFileName("results.pdf")
 
-        #outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
+        #outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png" 
         
         return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png", outlineImage = outlineImageLink)
         
@@ -190,8 +198,38 @@ def PlotShearForces(x_locationV, shearForces):
     plt.plot(x_locationV, shearForces)
     return plt.savefig(".\static\images\shearForces.png")
     
+def f1(x, mb_factor, m1_factor, q, l):
+    return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
+    #return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
 
+def f2(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
+    x = x - l
+    if n == 2:
+        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+    elif n == 3:
+        return (4 * mb_factor * q - 4 * m2_factor * q) * x**2 + (-4 * mb_factor * q * l + 4 * m2_factor * q * l) * x + mb_factor * q * l**2
+    elif n == 4 or n == 5:
+        return (2 * mb_factor * q + 2 * mc_factor * q - 4 * m2_factor * q) * x**2 + (-3 * mb_factor * q *l - mc_factor * q* l + 4 * m2_factor * q * l) * x + mb_factor * q * l**2
 
+def f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n):
+    x = x - (2 * l)
+    if n == 3:
+        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+    elif n == 4: 
+        return (2 * mc_factor * q + 2 * mb_factor * q- 4 * m2_factor * q) * x**2 + (-3 * mc_factor * q * l - mb_factor * q * l + 4 * m2_factor * q * l) * x + mc_factor * q * l**2
+    elif n == 5:
+        return (4 * mc_factor * q - 4 * m3_factor * q) * x**2 + (- 4 * mc_factor * q *l + 4 * m3_factor * q * l) * x + mc_factor * q * l**2
 
+def f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
+    x = x - (3 * l)
+    if n == 4:
+        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+    elif n == 5:
+        return (2 * mb_factor * q + 2 * mc_factor * q - 4 * m2_factor * q) * x**2 + (-3 * mc_factor * q *l - mb_factor * q* l + 4 * m2_factor * q * l) * x + mc_factor * q * l**2
+    
+def f5(x, mb_factor, m1_factor, q, l, n):
+    x = x - (4 * l)
+    if n == 5:
+        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
 
 
