@@ -2,6 +2,7 @@ import os
 from helpers import apology
 import csv 
 import sys
+from zipfile import ZipFile
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -21,8 +22,9 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 def index():
 
     list_of_fields = [1,2,3,4,5]
+    index = 0
     
-    return render_template("index.html", fields = list_of_fields)
+    return render_template("index.html", index = index, fields = list_of_fields)
 
 @app.route("/calculated", methods=["GET", "POST"])
 def calculation():
@@ -33,13 +35,14 @@ def calculation():
 
     if request.method == "POST":
         # Check for input errors
+        index = 0
 
-        if not request.form.get("span"):
-            return apology("Please enter a value for span!")
-        elif not request.form.get("fields"):
-            return apology("Please select a number of spans!")
+        if not request.form.get("fields"):
+            return render_template("index.html", index = 1, fields = list_of_fields)
+        elif not request.form.get("span"):
+            return render_template("index.html", index = 2, fields = list_of_fields)
         elif not request.form.get("load"):
-            return apology("Please enter a load value!")
+            return render_template("index.html", index = 3, fields = list_of_fields)
 
         n = int(request.form.get("fields")) # number of fields selected by the user (1-5)
         length = request.form.get("span") # span in meters
@@ -129,16 +132,7 @@ def calculation():
         elif n == 5:
             shearForces = [0, A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
-                        
-        #List for x-locations
-        #x_location = []
-        #half_L = l / 2
-        #xs = (x * half_L for x in range(0, l))
- 
-        #for i in range(n * 2 + 1):
-         #   x = i/2 * l
-          #  x_location.append(x)
-        
+                
         # x-locations for shear forces (because of 2 values at the supports)
         x_locationV = []
 
@@ -146,8 +140,7 @@ def calculation():
             x_loc = i * l
             x_locationV.append(x_loc)
             x_locationV.append(x_loc)
-            #if i != 0 and i != n:
-                #x_locationV.append(x_loc)
+
          #Plot graph V:
         ax = plt.gca()
         ax.invert_yaxis()
@@ -166,11 +159,6 @@ def calculation():
 
         x = np.arange(0, (n * l) + 1, 0.1)
         
-        #for x in xs: 
-           # M = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
-           # moments.append(M)
-        #f1 = (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
-        #f2 = x
         y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l), (x > 4 * l) & (x <= 5 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l, n), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
         ax = plt.gca()
         ax.invert_yaxis()
@@ -178,7 +166,7 @@ def calculation():
         ax.spines['top'].set_color('none')
         ax.spines['bottom'].set_position(('data', 0))
         plt.plot(x, y)
-        plt.savefig(".\static\images\moments.png")
+        plt.savefig(".\\static\\images\\results\\moments.png")
         plt.close()       
 
         with open(".\\static\\results.csv", "w") as r:
@@ -193,9 +181,11 @@ def calculation():
         #printer.setOutputFormat(QPrinter.PdfFormat)
         #printer.setOutputFileName("results.pdf")
 
-        #outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png" 
+        with ZipFile('.\\static\\images\\results.zip', 'w') as zip_object:
+            zip_object.write('.\\static\\images\\results\\moments.png')
+            zip_object.write('.\\static\\images\\results\\shearForces.png')
         
-        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\static\images\moments.png", shearForces = ".\static\images\shearForces.png", outlineImage = outlineImageLink)
+        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\\static\\images\\results\\moments.png", shearForces = ".\\static\\images\\results\\shearForces.png", outlineImage = outlineImageLink)
         
         
     else:
@@ -203,11 +193,11 @@ def calculation():
 
 def PlotMoments(x_location, moments):
     plt.plot(x_location, moments)
-    return plt.savefig(".\static\images\moments.png")
+    return plt.savefig(".\\static\\images\\results\\moments.png")
 
 def PlotShearForces(x_locationV, shearForces):
     plt.plot(x_locationV, shearForces)
-    return plt.savefig(".\static\images\shearForces.png")
+    return plt.savefig(".\\static\\images\\results\\shearForces.png")
     
 def f1(x, mb_factor, m1_factor, q, l, n):
     if n == 1:

@@ -4,48 +4,62 @@
     Home
 {% endblock %}
 
-{% block main %}
-    <header><h3>Welcome to my Beam Calculation Website!</h3></header>
+{% block main %}        
+    <header><h3>Beam Calculator</h3></header>
+    <p class = "text-md-center">This beam calculator helps you calculating the internal forces and support reactions of continuous beams with 1-5 spans.</p>
+    {% if index != 0 %}
 
-    <form action = "/calculated" method = "POST">
-        <table class = "table mytext table-unbordered">
-            <tbody>
-                <tr>
-                <td><b>Number of Spans:</b></td>
-                <td>
-                    <div class="mb-3">
-                        <select class="form-select mx-auto w-auto" name = "fields">
-                            <option disabled selected>Number of Fields</option>
-                            {% for field in fields %}
-                                <option value = "{{field}}">{{field}}</option>
-                            {% endfor %}
-                        </select>
-                    </div></td>
-                </tr>
-                <tr>
-                    <td><b>Span:</b></td>
-                    <td>
-                        <div class="mb-3">
-                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="shares" name="span" placeholder="Span" type="text">
-                        </div>
-                    </td>
-                    <td><b>m</b></td>
-                </tr>
-                <tr>
-                    <td><b>Constant Line Load:</b></td>
-                    <td><div class="mb-3">
-                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="load" name="load" placeholder="Load [kN/m]" type="text">
-                        </div>
-                    </td>
-                    <td text-align = "left"><b>kN/m</b></td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td class = "border-0 fw-bold text-end" colspan = "4"><button class="btn btn-light" type="submit">Calculate Forces</button></td>
-                </tr>
-            </tfoot>
-        </table>
-    <img src="\static\images\bridge.jpg" height="55%" width="65%" class="center">
-    </form>
+        <div class="container-lg d-flex flex-column align-items-center">
+        <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+            {% if index == 1 %}
+                Please choose a number of spans!
+            {% endif %}
+            {% if index == 2 %} 
+                Please enter a value for Span!
+            {% endif %}
+            {% if index == 3 %}
+                Please enter a value for Load!
+            {% endif %}    
+        </div>
+    </div>
+    {% endif %}
+    <div class="container-lg d-flex flex-column align-items-center mt-5">
+        <form action="/calculated" method="POST">
+            <div class="row g-3 align-items-center">
+                <div class="col-12">
+                    <label for="span" class="form-label"><b>Number of Spans:</b></label>
+                    <select class="form-select" name="fields">
+                        <option disabled selected>Number of Spans</option>
+                        {% for field in fields %}
+                        <option value="{{field}}">{{field}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="span" class="form-label"><b>Span:</b></label>
+                    <div class="input-group">
+                        <input class="form-control" id="span" name="span" placeholder="Span [m]">
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label for="load" class="form-label"><b>Constant Line Load:</b></label>
+                    <div class="input-group">
+                        <input class="form-control" id="load" name="load" placeholder="Line Load [kN/m]">
+                        <span class="input-group-text">kN/m</span>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button class="btn btn-light" type="submit">Calculate Forces</button> 
+                </div>
+            </div>
+        </form>
+        <div class="d-flex justify-content-center w-100 mt-3">
+            <img src="\static\images\bridge.jpg" class="img-fluid" style="max-width: 50%; height: auto;">
+        </div>
+    </div>
+    
+    
+
+    
 {% endblock %}

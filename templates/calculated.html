@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <h4>Input</h4>
+<div class="container-lg d-flex flex-column align-items-center mt-5">
+    <h3>Input</h3>
             <table class = "table table-bordered table-light table-striped ml-3" width = "5">
                 <tbody>
                     <tr>
@@ -22,12 +23,13 @@
                     </tr>
                 </tbody>
             </table> 
-        {% block csv %}
-
-        {% endblock %}
-    <h4>Results</h4>
-   
-            <table class="table table-bordered table-light table-striped">
+ </div>
+ <div class="d-flex">
+    <div class="container-lg d-flex align-items-center mt-5">  
+        <div style=" min-width: 40%; max-width: 40%; display: flex; flex-direction: column; justify-content: center;">
+            <div class="container-lg align-items-center">
+            <h3>Results</h3>  
+            <table class="table table-bordered table-light table-striped" width="3">
             <tbody>
                 <tr>
                     <td colspan = "2"><b>Support Forces:</b></td>
@@ -103,17 +105,31 @@
                 </tr>
                 {% endif %}
             </tbody>            
-        </table>    
-    <h4>Moment Diagram</h3>
-    <img src="{{moments}}" width="1000" height="400" class="center">
-    <h4>Shear Force Diagram</h3>
-    <img src="{{shearForces}}" width="1000" height="400" class="center"><br>
+            </table>   
+        </div>
+        </div> 
+        <div style="max-width: 60%;">
+            <div class="d-flex flex-column align-items-center">
+                <div>
+                    <h3>Moment Diagram</h3>
+        	        <img src="{{moments}}" class="img-fluid" style="max-width: 100%; height: auto;">
+                </div>
+                <div>
+                    <h3>Shear Force Diagram</h3>
+                    <img src="{{shearForces}}" class="img-fluid"style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-lg d-flex flex-column align-items-center mt-5">
     <p>
     <a class="btn btn-light" href="\">New Calculation</a>
     <a class="btn btn-light" href="\static\results.csv">Download Results as CSV</a>
     <a class="btn btn-light" href="\static\results.pdf">Download PDF-File</a>
-    <a class="btn btn-light" href="\static\diagrams.zip">Download Diagrams</a>
+    <a class="btn btn-light" href="\static\images\results.zip">Download Diagrams</a>
     </p>
+</div>
 
 
 {% endblock %}
