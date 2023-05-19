@@ -147,11 +147,24 @@ def calculation():
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
         ax.spines['bottom'].set_position(('data', 0))
-        plt.xticks = []
-        PlotShearForces(x_locationV, shearForces)
-        plt.close()
-        #print(x_locationV)
+        ax.spines['left'].set_position(('data', 0))
+        #PlotShearForces(x_locationV, shearForces)
         
+        #print(x_locationV)
+        # Call the function to find minima and maxima
+        minima_V, maxima_V = find_extrema(shearForces)
+        
+        # Plot these points
+        for i in minima_V:
+            plt.annotate(str(round(shearForces[i], 2)), (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+        for i in maxima_V:
+            plt.annotate(str(round(shearForces[i], 2)), (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+        
+        plt.plot(x_locationV, shearForces)
+        plt.savefig(".\\static\\images\\results\\shearForces.png")
+        plt.close()
+
         csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]
 
         #Plot graph My:
@@ -165,7 +178,25 @@ def calculation():
         ax.spines['right'].set_color('none')
         ax.spines['top'].set_color('none')
         ax.spines['bottom'].set_position(('data', 0))
+        ax.spines['left'].set_position(('data', 0))
+
         plt.plot(x, y)
+        
+        # Set x-axis labels every l/2
+        plt.xticks(np.arange(0, max(x), l/2))
+      #  plt.xticks(range(1,10), x)
+
+        
+        # Call the function to find minima and maxima
+        minima, maxima = find_extrema(y)
+
+        # Plot these points
+        for i in minima:
+            plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+        for i in maxima:
+            plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+
         plt.savefig(".\\static\\images\\results\\moments.png")
         plt.close()       
 
@@ -199,6 +230,11 @@ def PlotShearForces(x_locationV, shearForces):
     plt.plot(x_locationV, shearForces)
     return plt.savefig(".\\static\\images\\results\\shearForces.png")
     
+def find_extrema(y_data):
+    minima = [i for i in range(1, len(y_data)-1) if y_data[i-1] > y_data[i] < y_data[i+1]]
+    maxima = [i for i in range(1, len(y_data)-1) if y_data[i-1] < y_data[i] > y_data[i+1]]
+    return minima, maxima    
+
 def f1(x, mb_factor, m1_factor, q, l, n):
     if n == 1:
         return q * (l**2) / 8

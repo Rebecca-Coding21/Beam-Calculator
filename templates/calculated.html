@@ -7,10 +7,10 @@
 {% block main %}
 <div class="container-lg d-flex flex-column align-items-center mt-5">
     <h3>Input</h3>
-            <table class = "table table-bordered table-light table-striped ml-3" width = "5">
+            <table class = "table table-bordered table-light table-striped ml-3 text-center">
                 <tbody>
                     <tr>
-                        <td><b>Number of Fields</b></td>
+                        <td><b>Number of Spans</b></td>
                         <td><b>Outline</b></td>
                         <td><b>Span</b></td>
                         <td><b>Constant Line Load</b></td>
@@ -24,103 +24,99 @@
                 </tbody>
             </table> 
  </div>
- <div class="d-flex">
-    <div class="container-lg d-flex align-items-center mt-5">  
-        <div style=" min-width: 40%; max-width: 40%; display: flex; flex-direction: column; justify-content: center;">
-            <div class="container-lg align-items-center">
+    <div class="container-lg d-flex flex-column align-items-center mt-5">
+        
             <h3>Results</h3>  
-            <table class="table table-bordered table-light table-striped" width="3">
+            <table class="table table-bordered table-light table-striped text-center">
             <tbody>
                 <tr>
-                    <td colspan = "2"><b>Support Forces:</b></td>
+                    <td colspan ="2"><b>Support Forces</b></td>
+                    <td colspan="2"><b>Shear Forces</b></td>
+                    <td colspan="2"><b>Bending Moments</b></td>
                 </tr>
                 <tr>
-                    <td>A</td>
+                    <td><b>A:</b></td>
                     <td>{{A}} kN</td>
-                </tr>
-                {% if B != 0 %}
-                <tr>
-                    <td>B</td>
-                    <td>{{B}} kN</td>
-                </tr>
-                {% endif %}
-                {% if C != 0 %}
-                <tr>
-                    <td>C</td>
-                    <td>{{C}} kN</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td colspan="2"><b>Shear Forces:</b></td>
-                </tr>
-                <tr>
-                    <td>Vbl:</td>
+                    <td><b>Vbl:</b></td>
                     <td>{{Vbl}} kN</td>
-                </tr>
-                {% if Vbr != 0 %}
-                <tr>
-                    <td>Vbr:</td>
-                    <td>{{Vbr}} kN</td>
-                </tr>
-                {% endif %}
-                {% if Vcl != 0 %}
-                <tr>
-                    <td>Vcl:</td>
-                    <td>{{Vcl}} kN</td>
-                </tr>
-                {% endif %}
-                {% if Vcr != 0 %}
-                <tr>
-                    <td>Vcr:</td>
-                    <td>{{Vcr}} kN</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td colspan="2"><b>Bending Moments:</b></td>
-                </tr>
-                <tr>
-                    <td>Field Moment M1:</td>
+                    <td><b>Field Moment M1:</b></td>
                     <td>{{M1}} kNm</td>
-                </tr>
-                {% if M2 != 0 %}
-                <tr>
-                    <td>Field Moment M2:</td>
+                </tr>                
+                <tr>                
+                    <td><b>B:</b></td>
+                    {% if B != 0 %}
+                    <td>{{B}} kN</td>
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}                
+                    <td><b>Vbr:</b></td>
+                    {% if Vbr != 0 %}
+                    <td>{{Vbr}} kN</td>
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}                
+                    <td><b>Field Moment M2:</b></td>
+                    {% if M2 != 0 %}
                     <td>{{M2}} kNm</td>
-                </tr>
-                {% endif %}
-                {% if M3 != 0 %}
-                <tr>
-                    <td>Field Moment M3:</td>
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}                
+                </tr>   
+                <tr>                
+                    <td><b>C:</b></td>
+                    {% if C != 0 %}
+                    <td>{{C}} kN</td>
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}                 
+                    <td><b>Vcl:</b></td>
+                    {% if Vcl != 0 %}
+                    <td>{{Vcl}} kN</td>
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}                
+                    <td><b>Field Moment M3:</b></td>
+                    {% if M3 != 0 %}
                     <td>{{M3}} kNm</td>
-                </tr>
-                {% endif %}
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}
+                </tr>   
                 <tr>
-                    <td>Support Moment Mb:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>Support Moment Mb:</b></td>
                     <td>{{Mb}} kNm</td>
-                </tr>
-                {% if Mc != 0 %}
+                </tr>  
                 <tr>
-                    <td>Support Moment Mc:</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>Support Moment Mc:</b></td>
+                    {% if Mc != 0 %}
                     <td>{{Mc}} kNm</td>
-                </tr>
-                {% endif %}
+                    {% else %}
+                    <td> - </td>
+                    {% endif %}
+                </tr>                  
             </tbody>            
             </table>   
         </div>
-        </div> 
-        <div style="max-width: 60%;">
-            <div class="d-flex flex-column align-items-center">
-                <div>
-                    <h3>Moment Diagram</h3>
-        	        <img src="{{moments}}" class="img-fluid" style="max-width: 100%; height: auto;">
-                </div>
-                <div>
-                    <h3>Shear Force Diagram</h3>
-                    <img src="{{shearForces}}" class="img-fluid"style="max-width: 100%; height: auto;">
-                </div>
-            </div>
-        </div>
+        </div>        
     </div>
+</div>
+<div class="container-lg d-flex align-items-center mt-5">
+        <div class="text-center" style="margin-right: 20px;">
+            <h3>Moment Diagram</h3>
+            <img src="{{moments}}" class="img-fluid" style="max-width: 100%; height: auto;">
+        </div>
+        <div class="text-center" style="margin-left: 20px;">
+            <h3>Shear Force Diagram</h3>
+            <img src="{{shearForces}}" class="img-fluid"style="max-width: 100%; height: auto;">
+        </div>
 </div>
 <div class="container-lg d-flex flex-column align-items-center mt-5">
     <p>
@@ -130,6 +126,5 @@
     <a class="btn btn-light" href="\static\images\results.zip">Download Diagrams</a>
     </p>
 </div>
-
 
 {% endblock %}
