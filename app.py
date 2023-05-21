@@ -170,7 +170,7 @@ def calculation():
         #Plot graph My:
         #PlotMoments(x, moments)
 
-        x = np.arange(0, (n * l) + 1, 0.1)
+        x = np.arange(0, (n * l) + 1, 0.05)
         
         y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l), (x > 4 * l) & (x <= 5 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l, n), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
         ax = plt.gca()
