@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block main %}
+<script>
+    function printPdf()
+    {
+        this.print({bUI: false, bSilent: true, bShrinkToFit: true});
+    }
+</script>
+
 <div class="container-lg d-flex flex-column align-items-center mt-5">
     <h3>Input</h3>
             <table class = "table table-bordered table-light table-striped ml-3 text-center">
@@ -122,7 +129,7 @@
     <p>
     <a class="btn btn-light" href="\">New Calculation</a>
     <a class="btn btn-light" href="\static\results.csv">Download Results as CSV</a>
-    <a class="btn btn-light" href="\static\results.pdf">Download PDF-File</a>
+    <button class="btn btn-light" onclick="printPdf()">Print Page to PDF-File</button>
     <a class="btn btn-light" href="\static\images\results.zip">Download Diagrams</a>
     </p>
 </div>
