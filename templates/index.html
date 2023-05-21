@@ -5,11 +5,12 @@
 {% endblock %}
 
 {% block main %}        
-    <header><h3>Beam Calculator</h3></header>
-    <p class = "text-md-center">This beam calculator helps you calculating the internal forces and support reactions of continuous beams with 1-5 spans.</p>
+<div class="container-lg d-flex flex-column align-items-center mt-2">
+    <p class = "text-md-center" style="font-size: 18px;">This beam calculator helps you calculating the internal forces and support reactions of continuous beams with 2-5 spans.</p>
+</div>
     {% if index != 0 %}
 
-        <div class="container-lg d-flex flex-column align-items-center">
+    <div class="container-lg d-flex flex-column align-items-center">
         <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
             {% if index == 1 %}
                 Please choose a number of spans!

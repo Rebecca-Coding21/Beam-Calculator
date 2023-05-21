@@ -21,7 +21,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 @app.route("/", methods = ["GET", "POST"])
 def index():
 
-    list_of_fields = [1,2,3,4,5]
+    list_of_fields = [2,3,4,5]
     index = 0
     
     return render_template("index.html", index = index, fields = list_of_fields)
@@ -29,11 +29,10 @@ def index():
 @app.route("/calculated", methods=["GET", "POST"])
 def calculation():
     
-    list_of_fields = [1,2,3,4,5]
-
-    # Post = Calculate Button is pressed
+    list_of_fields = [2,3,4,5]
 
     if request.method == "POST":
+        
         # Check for input errors
         index = 0
 
@@ -44,18 +43,21 @@ def calculation():
         elif not request.form.get("load"):
             return render_template("index.html", index = 3, fields = list_of_fields)
 
+        #get variables from user-input
         n = int(request.form.get("fields")) # number of fields selected by the user (1-5)
         length = request.form.get("span") # span in meters
         l = float(length.replace(",", "."))
         load = request.form.get("load") # constant line-load in kN/m
         q = float(load.replace(",", "."))
         
+        #get moment factors for calculation from csv-file
         momentfactorsData = []
 
         with open("momentfactors.csv") as momentfactorFile:
             momentfactorsData = csv.reader(momentfactorFile)
             momentfactors = list(momentfactorsData)
         
+        #define factors for calculation
         m1_factor = float(momentfactors[n][1])
         m2_factor = float(momentfactors[n][2])
         m3_factor = float(momentfactors[n][3])
@@ -97,41 +99,32 @@ def calculation():
             Vbr = round(Vbr_factor * q * l,2)
             Vcl = round(Vcl_factor * q * l,2)
             Vcr = round(Vcr_factor * q * l,2)
-
-        # list of moments
-        #moments = []
-        #if n == 1:
-           # moments = [0.0, M1, 0.0]
-        #elif n == 2:
-           # moments = [0.0, M1, Mb, M1, 0.0]
-           # outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
-        #elif n == 3:
-           # moments = [0.0, M1, Mb, M2, Mb, M1, 0.0]
-          #  outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
-        #elif n == 4:
-           # moments = [0.0, M1, Mb, M2, Mc, M2, Mb, M1, 0.0]
-           # outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
-        #elif n == 5:
-           # moments = [0.0, M1, Mb, M2, Mc, M3, Mc, M2, Mb, M1, 0.0]
-           # outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
         
         #list of shear forces
         shearForces = []
-        if n == 1:
-            shearForces = [0, A, -A, 0]
-            outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
-        elif n == 2:
-            shearForces = [0, A, Vbl, -Vbl, -A, 0] # two values at one x-location!!! 
+       # if n == 1:
+            #shearForces = [A, -A, 0]
+            #outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
+        if n == 2:
+            shearForces = [A, Vbl, -Vbl, -A, 0] # two values at one x-location!!! 
             outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
+            shearForces_minima = ['Vbl', 'A']
+            shearForces_maxima = ['-Vbl']
         elif n == 3:
-            shearForces = [0, A, Vbl, Vbr, Vbl, Vbr, -A, 0]
+            shearForces = [A, Vbl, Vbr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
+            shearForces_minima = ['Vbl', 'Vbl', 'A']
+            shearForces_maxima = ['Vbr', 'Vbr']
         elif n == 4:
-            shearForces = [0, A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A, 0]
+            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
+            shearForces_minima = ['Vbl', 'Vcl', 'Vbl', 'A']
+            shearForces_maxima = ['Vbr', 'Vcl', 'Vbr']
         elif n == 5:
-            shearForces = [0, A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A, 0]
+            shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
+            shearForces_minima = ['Vbl', 'Vcl', 'Vcl', 'Vbl', 'A']
+            shearForces_maxima = ['Vbr', 'Vcl', 'Vcl', 'Vbr']
                 
         # x-locations for shear forces (because of 2 values at the supports)
         x_locationV = []
@@ -139,7 +132,9 @@ def calculation():
         for i in range(n + 1):
             x_loc = i * l
             x_locationV.append(x_loc)
-            x_locationV.append(x_loc)
+
+            if(x_loc != 0):
+                x_locationV.append(x_loc)      
 
          #Plot graph V:
         ax = plt.gca()
@@ -150,23 +145,35 @@ def calculation():
         ax.spines['left'].set_position(('data', 0))
         #PlotShearForces(x_locationV, shearForces)
         
-        #print(x_locationV)
         # Call the function to find minima and maxima
         minima_V, maxima_V = find_extrema(shearForces)
         
         # Plot these points
-        for i in minima_V:
-            plt.annotate(str(round(shearForces[i], 2)), (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,10), ha='center')
+        for i, min_str in zip(minima_V, shearForces_minima):
+            plt.annotate(min_str, (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,10), ha='center')
 
-        for i in maxima_V:
-            plt.annotate(str(round(shearForces[i], 2)), (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+        for i, max_str in zip(maxima_V, shearForces_maxima):
+            plt.annotate(max_str, (x_locationV[i], shearForces[i]), textcoords="offset points", xytext=(0,-15), ha='center')
         
         plt.plot(x_locationV, shearForces)
+        plt.xticks(np.arange(0, max(x_locationV) + 1, l/2))
         plt.savefig(".\\static\\images\\results\\shearForces.png")
         plt.close()
 
-        csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]
-
+        #find minima for moments
+        if(n == 2):
+            moments_minima = ['Mb']
+            moments_maxima = ['M1', 'M1']
+        elif(n == 3):
+            moments_minima = ['Mb', 'Mb']
+            moments_maxima = ['M1', 'M2', 'M1']
+        elif(n == 4):
+            moments_minima = ['Mb', 'Mc', 'Mb']
+            moments_maxima = ['M1', 'M2', 'M2', 'M1']
+        elif(n == 5):
+            moments_minima = ['Mb', 'Mc', 'Mc', 'Mb']
+            moments_maxima = ['M1', 'M2', 'M3', 'M2', 'M1']
+            
         #Plot graph My:
         #PlotMoments(x, moments)
 
@@ -191,27 +198,25 @@ def calculation():
         minima, maxima = find_extrema(y)
 
         # Plot these points
-        for i in minima:
-            plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,10), ha='center')
+        for i, min_str in zip(minima, moments_minima):
+            plt.annotate(min_str, (x[i], y[i]), textcoords="offset points", xytext=(0,10), ha='center')
 
-        for i in maxima:
-            plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+        for i, max_str in zip(maxima, moments_maxima):
+            plt.annotate(max_str, (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
+            #plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
 
         plt.savefig(".\\static\\images\\results\\moments.png")
-        plt.close()       
+        plt.close()    
+
+        #create csv-file for results
+        csv_results = [M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr]   
 
         with open(".\\static\\results.csv", "w") as r:
             writer = csv.writer(r)
             writer.writerow('M1, M2, M3, Mb, Mc, A, B, C, Vbl, Vbr, Vcl, Vcr')
             writer.writerow(csv_results)
         
-        #web = QWebView()
-        #web.load(QUrl("http://127.0.0.1:5000/calculated"))
-        #printer = QPrinter()
-        #printer.setPageSize(QPrinter.A4)
-        #printer.setOutputFormat(QPrinter.PdfFormat)
-        #printer.setOutputFileName("results.pdf")
-
+        #create zip-file for diagrams
         with ZipFile('.\\static\\images\\results.zip', 'w') as zip_object:
             zip_object.write('.\\static\\images\\results\\moments.png')
             zip_object.write('.\\static\\images\\results\\shearForces.png')
@@ -222,13 +227,13 @@ def calculation():
     else:
         return render_template("index.html")
 
-def PlotMoments(x_location, moments):
-    plt.plot(x_location, moments)
-    return plt.savefig(".\\static\\images\\results\\moments.png")
+#def PlotMoments(x_location, moments):
+ #   plt.plot(x_location, moments)
+  #  return plt.savefig(".\\static\\images\\results\\moments.png")
 
-def PlotShearForces(x_locationV, shearForces):
-    plt.plot(x_locationV, shearForces)
-    return plt.savefig(".\\static\\images\\results\\shearForces.png")
+#def PlotShearForces(x_locationV, shearForces):
+ #   plt.plot(x_locationV, shearForces)
+  #  return plt.savefig(".\\static\\images\\results\\shearForces.png")
     
 def find_extrema(y_data):
     minima = [i for i in range(1, len(y_data)-1) if y_data[i-1] > y_data[i] < y_data[i+1]]
@@ -239,12 +244,12 @@ def f1(x, mb_factor, m1_factor, q, l, n):
     if n == 1:
         return q * (l**2) / 8
     else:
-        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (2 * m1_factor * q * l - l/2 * (2 * mb_factor * q - 4 * m1_factor * q)) * x
+        return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(2/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x
 
 def f2(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
     x = x - l
     if n == 2:
-        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+        return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(8/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x + mb_factor * q * l**2
     elif n == 3:
         return (4 * mb_factor * q - 4 * m2_factor * q) * x**2 + (-4 * mb_factor * q * l + 4 * m2_factor * q * l) * x + mb_factor * q * l**2
     elif n == 4 or n == 5:
@@ -253,7 +258,7 @@ def f2(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
 def f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n):
     x = x - (2 * l)
     if n == 3:
-        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+        return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(8/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x + mb_factor * q * l**2   
     elif n == 4: 
         return (2 * mc_factor * q + 2 * mb_factor * q- 4 * m2_factor * q) * x**2 + (-3 * mc_factor * q * l - mb_factor * q * l + 4 * m2_factor * q * l) * x + mc_factor * q * l**2
     elif n == 5:
@@ -262,13 +267,13 @@ def f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n):
 def f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n):
     x = x - (3 * l)
     if n == 4:
-        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+        return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(8/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x + mb_factor * q * l**2
     elif n == 5:
         return (2 * mb_factor * q + 2 * mc_factor * q - 4 * m2_factor * q) * x**2 + (-3 * mc_factor * q *l - mb_factor * q* l + 4 * m2_factor * q * l) * x + mc_factor * q * l**2
     
 def f5(x, mb_factor, m1_factor, q, l, n):
     x = x - (4 * l)
     if n == 5:
-        return (2 * mb_factor * q - 4 * m1_factor * q) * x**2 + (-3 * mb_factor * q * l + 4 * m1_factor * q * l) * x + mb_factor * q * l**2
+        return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(8/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x + mb_factor * q * l**2
 
 
