@@ -1,5 +1,4 @@
 import os
-from helpers import apology
 import csv 
 import sys
 from zipfile import ZipFile
@@ -9,9 +8,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from flask import Flask, redirect, render_template, flash, request
-#from PyQt5.QtCore import *
-#from PyQt5.QtGui import *
-#from PyQt5.QtWebKit import *
 
 app = Flask(__name__)
 
@@ -83,48 +79,42 @@ def calculation():
         Vcl = 0.0
         Vcr = 0.0
 
-        if n == 1:
-            Vbl = (q * l)/2     # Shear Force at both supports in kN
-            M1 = float((q * l**2)/8 )  # Bending - Moment in middle of field in kNm
-        else:
-            M1 = round(m1_factor * q * l**2,2)
-            M2 = round(m2_factor * q * l**2,2)
-            M3 = round(m3_factor * q * l**2,2)
-            Mb = round(mb_factor * q * l**2,2)
-            Mc = round(mc_factor * q * l**2,2)
-            A = round(A_factor * q * l,2)
-            B = round(B_factor * q * l,2)
-            C = round(C_factor * q * l,2)
-            Vbl = round(Vbl_factor * q * l,2)
-            Vbr = round(Vbr_factor * q * l,2)
-            Vcl = round(Vcl_factor * q * l,2)
-            Vcr = round(Vcr_factor * q * l,2)
+        
+        M2 = round(m2_factor * q * l**2,2)
+        M1 = round(m1_factor * q * l**2,2)
+        M3 = round(m3_factor * q * l**2,2)
+        Mb = round(mb_factor * q * l**2,2)
+        Mc = round(mc_factor * q * l**2,2)
+        A = round(A_factor * q * l,2)
+        B = round(B_factor * q * l,2)
+        C = round(C_factor * q * l,2)
+        Vbl = round(Vbl_factor * q * l,2)
+        Vbr = round(Vbr_factor * q * l,2)
+        Vcl = round(Vcl_factor * q * l,2)
+        Vcr = round(Vcr_factor * q * l,2)
         
         #list of shear forces
         shearForces = []
-       # if n == 1:
-            #shearForces = [A, -A, 0]
-            #outlineImageLink = ".\static\images\schemeimage_einfeldträger.png"
         if n == 2:
             shearForces = [A, Vbl, -Vbl, -A, 0] # two values at one x-location!!! 
             outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
-            shearForces_minima = ['Vbl', 'A']
-            shearForces_maxima = ['-Vbl']
+            shearForces_minima = [Vbl, A]
+            shearForces_maxima = [-Vbl]
         elif n == 3:
             shearForces = [A, Vbl, Vbr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_dreifeldträger.png"
-            shearForces_minima = ['Vbl', 'Vbl', 'A']
-            shearForces_maxima = ['Vbr', 'Vbr']
+            shearForces_minima = [Vbl, Vbl, A]
+            shearForces_maxima = [Vbr, Vbr]
         elif n == 4:
             shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_vierfeldträger.png"
-            shearForces_minima = ['Vbl', 'Vcl', 'Vbl', 'A']
-            shearForces_maxima = ['Vbr', 'Vcl', 'Vbr']
+            shearForces_minima = [Vbl, Vcl, Vbl, A]
+            shearForces_maxima = [Vbr, Vcl, Vbr]
         elif n == 5:
             shearForces = [A, Vbl, Vbr, Vcl, Vcr, Vcl, Vcr, Vbl, Vbr, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_fünffeldträger.png"
-            shearForces_minima = ['Vbl', 'Vcl', 'Vcl', 'Vbl', 'A']
-            shearForces_maxima = ['Vbr', 'Vcl', 'Vcl', 'Vbr']
+            shearForces_minima = [Vbl, Vcl, Vcl, Vbl, A]
+            shearForces_maxima = [Vbr, Vcl, Vcl, Vbr]
                 
         # x-locations for shear forces (because of 2 values at the supports)
         x_locationV = []
@@ -162,17 +152,17 @@ def calculation():
 
         #find minima for moments
         if(n == 2):
-            moments_minima = ['Mb']
-            moments_maxima = ['M1', 'M1']
+            moments_minima = [Mb]
+            moments_maxima = [M1, M1]
         elif(n == 3):
-            moments_minima = ['Mb', 'Mb']
-            moments_maxima = ['M1', 'M2', 'M1']
+            moments_minima = [Mb, Mb]
+            moments_maxima = [M1, M2, M1]
         elif(n == 4):
-            moments_minima = ['Mb', 'Mc', 'Mb']
-            moments_maxima = ['M1', 'M2', 'M2', 'M1']
+            moments_minima = [Mb, Mc, Mb]
+            moments_maxima = [M1, M2, M2, M1]
         elif(n == 5):
-            moments_minima = ['Mb', 'Mc', 'Mc', 'Mb']
-            moments_maxima = ['M1', 'M2', 'M3', 'M2', 'M1']
+            moments_minima = [Mb, Mc, Mc, Mb]
+            moments_maxima = [M1, M2, M3, M2, M1]
             
         #Plot graph My:
         #PlotMoments(x, moments)
@@ -191,7 +181,7 @@ def calculation():
         
         # Set x-axis labels every l/2
         plt.xticks(np.arange(0, max(x), l/2))
-      #  plt.xticks(range(1,10), x)
+        # plt.xticks(range(1,10), x)
 
         
         # Call the function to find minima and maxima
@@ -203,7 +193,6 @@ def calculation():
 
         for i, max_str in zip(maxima, moments_maxima):
             plt.annotate(max_str, (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
-            #plt.annotate(str(round(y[i], 2)), (x[i], y[i]), textcoords="offset points", xytext=(0,-15), ha='center')
 
         plt.savefig(".\\static\\images\\results\\moments.png")
         plt.close()    
@@ -221,19 +210,9 @@ def calculation():
             zip_object.write('.\\static\\images\\results\\moments.png')
             zip_object.write('.\\static\\images\\results\\shearForces.png')
         
-        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\\static\\images\\results\\moments.png", shearForces = ".\\static\\images\\results\\shearForces.png", outlineImage = outlineImageLink)
-        
-        
+        return render_template("calculated.html", span = l, load = q, fields = n, Vbl = Vbl, Vbr = Vbr, Vcl = Vcl, Vcr = Vcr, M1 = M1, M2 = M2, M3 = M3, Mb = Mb, Mc = Mc, A = A, B = B, C = C, moments = ".\\static\\images\\results\\moments.png", shearForces = ".\\static\\images\\results\\shearForces.png", outlineImage = outlineImageLink)   
     else:
         return render_template("index.html")
-
-#def PlotMoments(x_location, moments):
- #   plt.plot(x_location, moments)
-  #  return plt.savefig(".\\static\\images\\results\\moments.png")
-
-#def PlotShearForces(x_locationV, shearForces):
- #   plt.plot(x_locationV, shearForces)
-  #  return plt.savefig(".\\static\\images\\results\\shearForces.png")
     
 def find_extrema(y_data):
     minima = [i for i in range(1, len(y_data)-1) if y_data[i-1] > y_data[i] < y_data[i+1]]
