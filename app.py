@@ -32,12 +32,23 @@ def calculation():
         # Check for input errors
         index = 0
 
-        if not request.form.get("fields"):
+        if not request.form.get("fields"):            
             return render_template("index.html", index = 1, fields = list_of_fields)
         elif not request.form.get("span"):
             return render_template("index.html", index = 2, fields = list_of_fields)
         elif not request.form.get("load"):
             return render_template("index.html", index = 3, fields = list_of_fields)
+        
+        try:
+            float(request.form.get("span").replace(",", "."))
+        except:
+            return render_template("index.html", index = 4, fields = list_of_fields)
+        
+        try:
+            float(request.form.get("load").replace(",", "."))
+        except:
+            return render_template("index.html", index = 5, fields = list_of_fields)
+            
 
         #get variables from user-input
         n = int(request.form.get("fields")) # number of fields selected by the user (1-5)
