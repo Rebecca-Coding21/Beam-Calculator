@@ -45,7 +45,11 @@
                     <td><b>A:</b></td>
                     <td>{{A}} kN</td>
                     <td><b>Vbl:</b></td>
-                    <td>{{Vbl}} kN</td>
+                    {% if Vbl != 0 %}
+                        <td>{{Vbl}} kN</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
                     <td><b>Field Moment M1:</b></td>
                     <td>{{M1}} kNm</td>
                 </tr>                

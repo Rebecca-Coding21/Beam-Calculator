@@ -17,7 +17,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 @app.route("/", methods = ["GET", "POST"])
 def index():
 
-    list_of_fields = [2,3,4,5]
+    list_of_fields = [1,2,3,4,5]
     index = 0
     
     return render_template("index.html", index = index, fields = list_of_fields)
@@ -25,7 +25,7 @@ def index():
 @app.route("/calculated", methods=["GET", "POST"])
 def calculation():
     
-    list_of_fields = [2,3,4,5]
+    list_of_fields = [1,2,3,4,5]
 
     if request.method == "POST":
         
@@ -65,18 +65,20 @@ def calculation():
             momentfactors = list(momentfactorsData)
         
         #define factors for calculation
-        m1_factor = float(momentfactors[n][1])
-        m2_factor = float(momentfactors[n][2])
-        m3_factor = float(momentfactors[n][3])
-        mb_factor = float(momentfactors[n][4])
-        mc_factor = float(momentfactors[n][5])
-        A_factor = float(momentfactors[n][6])
-        B_factor = float(momentfactors[n][7])
-        C_factor = float(momentfactors[n][8])
-        Vbl_factor = float(momentfactors[n][9])
-        Vbr_factor = float(momentfactors[n][10])     
-        Vcl_factor = float(momentfactors[n][11])  
-        Vcr_factor = float(momentfactors[n][12])            
+        if(n != 1):
+            m1_factor = float(momentfactors[n][1])
+            m2_factor = float(momentfactors[n][2])
+            m3_factor = float(momentfactors[n][3])
+            mb_factor = float(momentfactors[n][4])
+            mc_factor = float(momentfactors[n][5])
+            A_factor = float(momentfactors[n][6])
+            B_factor = float(momentfactors[n][7])
+            C_factor = float(momentfactors[n][8])
+            Vbl_factor = float(momentfactors[n][9])
+            Vbr_factor = float(momentfactors[n][10])     
+            Vcl_factor = float(momentfactors[n][11])  
+            Vcr_factor = float(momentfactors[n][12])    
+
         M1 = 0.0
         M2 = 0.0
         M3 = 0.0
@@ -90,24 +92,32 @@ def calculation():
         Vcl = 0.0
         Vcr = 0.0
 
-        
-        M2 = round(m2_factor * q * l**2,2)
-        M1 = round(m1_factor * q * l**2,2)
-        M3 = round(m3_factor * q * l**2,2)
-        Mb = round(mb_factor * q * l**2,2)
-        Mc = round(mc_factor * q * l**2,2)
-        A = round(A_factor * q * l,2)
-        B = round(B_factor * q * l,2)
-        C = round(C_factor * q * l,2)
-        Vbl = round(Vbl_factor * q * l,2)
-        Vbr = round(Vbr_factor * q * l,2)
-        Vcl = round(Vcl_factor * q * l,2)
-        Vcr = round(Vcr_factor * q * l,2)
+        if (n == 1):
+            M1 = round(0.125 * q * l**2,2)
+            A = q * l
+        else:
+            M2 = round(m2_factor * q * l**2,2)
+            M1 = round(m1_factor * q * l**2,2)
+            M3 = round(m3_factor * q * l**2,2)
+            Mb = round(mb_factor * q * l**2,2)
+            Mc = round(mc_factor * q * l**2,2)
+            A = round(A_factor * q * l,2)
+            B = round(B_factor * q * l,2)
+            C = round(C_factor * q * l,2)
+            Vbl = round(Vbl_factor * q * l,2)
+            Vbr = round(Vbr_factor * q * l,2)
+            Vcl = round(Vcl_factor * q * l,2)
+            Vcr = round(Vcr_factor * q * l,2)
         
         #list of shear forces
         shearForces = []
+        if n == 1:
+            shearForces = [A, -A, 0] 
+            shearForces_minima = [-A]
+            shearForces_maxima = [A]
+            outlineImageLink = ""
         if n == 2:
-            shearForces = [A, Vbl, -Vbl, -A, 0] # two values at one x-location!!! 
+            shearForces = [A, Vbl, -Vbl, -A, 0]
             outlineImageLink = ".\static\images\schemeimage_zweifeldträger.png"
             shearForces_minima = [Vbl, A]
             shearForces_maxima = [-Vbl]
@@ -162,6 +172,9 @@ def calculation():
         plt.close()
 
         #find minima for moments
+        if (n == 1):
+            moments_minima = []
+            moments_maxima = [M1]
         if(n == 2):
             moments_minima = [Mb]
             moments_maxima = [M1, M1]
@@ -178,9 +191,14 @@ def calculation():
         #Plot graph My:
         #PlotMoments(x, moments)
 
-        x = np.arange(0, (n * l) + 1, 0.05)
         
-        y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l), (x > 4 * l) & (x <= 5 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l, n), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
+        
+        if(n == 1):
+            x = np.arange(0, l + 0.05, 0.05)
+            y = -0.5 * q * x**2 + 0.5 * q * l * x
+        else:
+            x = np.arange(0, (n * l) + 1, 0.05)
+            y = np.piecewise(x,[x <= l, (x > l) & (x <= 2 * l), (x > 2 * l) & (x <= 3 * l), (x > 3 * l) & (x <= 4 * l), (x > 4 * l) & (x <= 5 * l)], [lambda x: f1(x, mb_factor, m1_factor, q, l, n), lambda x: f2(x,mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f3(x, mb_factor, m1_factor, m2_factor, m3_factor, mc_factor, q, l, n), lambda x: f4(x, mb_factor, m1_factor, m2_factor, mc_factor, q, l, n), lambda x: f5(x, mb_factor, m1_factor, q, l, n)])
         ax = plt.gca()
         ax.invert_yaxis()
         ax.spines['right'].set_color('none')
@@ -232,7 +250,7 @@ def find_extrema(y_data):
 
 def f1(x, mb_factor, m1_factor, q, l, n):
     if n == 1:
-        return q * (l**2) / 8
+        return (q/l) * x**2 - q * x
     else:
         return ((5/3) * mb_factor * q - (25/6) * m1_factor * q) * x**2 + (-(2/3) * mb_factor * q * l + (25/6) * m1_factor * q * l) * x
 
