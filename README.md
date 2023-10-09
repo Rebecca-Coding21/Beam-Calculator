@@ -1,4 +1,5 @@
 # Beam Calculator
+![image](https://github.com/Rebecca-Coding21/Beam-Calculator/assets/94243632/6f0d126d-9ab7-4c42-b512-f5e6b22a0a09)
 ### Video Demo: https://youtu.be/0ZYb2AWQ1gQ
 ### Descripton: 
 The Beam Calculator is a web application to calculate the internal forces for continuous beams with two to five spans and a continuous line load. This is a useful tool for civil engineers, especailly for structural engineering. It can also help students controlling their hand calculations. 
