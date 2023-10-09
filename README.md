@@ -1,11 +1,15 @@
 # Beam Calculator
-![image](https://github.com/Rebecca-Coding21/Beam-Calculator/assets/94243632/6f0d126d-9ab7-4c42-b512-f5e6b22a0a09)
+![image](https://github.com/Rebecca-Coding21/Beam-Calculator/assets/94243632/a9eaac07-4942-4589-ba80-f5f085efa9ff)
+
 ### Video Demo: https://youtu.be/0ZYb2AWQ1gQ
 ### Descripton: 
 The Beam Calculator is a web application to calculate the internal forces for continuous beams with two to five spans and a continuous line load. This is a useful tool for civil engineers, especailly for structural engineering. It can also help students controlling their hand calculations. 
 The user can input the number of spans, the length of the span and a value for the continuous line load. Integer and float values are possible. If one input is missing, an error message is displayed at the top of the page.
 After calculation, the user is directed to a new page. The page contains a table that summarizes the input data, a table with the results, including all relevant internal forces as well as the support forces of the beam. At the bottom of the page two diagrams show the torque curve and the shear force progression. 
 The four buttons at the bottom enable the user to either start a new calculation, download the result values in csv-format, download the diagrams or print the whole page to pdf. The pdf-file can be useful as a summary of the results.
+
+![image](https://github.com/Rebecca-Coding21/Beam-Calculator/assets/94243632/a9332da9-5c24-4a46-b356-0c47192222c1)
+
 
 #### Tech Stack:
 The application uses python in combination with flask as programming language. The style of the website is created by using HTML, CSS and Bootstrap 5. For the creation of the diagrams the mathplotlib library was used. The webpage is responsive which means that it adapts to the screensize of the user.
